@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RadixTreeSort.Sequential;
+using RadixTreeSort;
+using System.Diagnostics;
 
 namespace RadixTreeSort
 {
@@ -32,8 +33,26 @@ namespace RadixTreeSort
         /// </summary>
         private void RunTest(int size, int maxValue)
         {
+            Stopwatch timer = new Stopwatch();
             int[] array = Utility.GetRandomArray(size, maxValue);
-            SequentialRadixTreeSort.Run(array);
+            int[] sArray = new int[array.Length];
+            int[] pArray = new int[array.Length];
+            array.CopyTo(sArray, 0);
+            array.CopyTo(pArray, 0);
+
+            // run sequential test
+            timer.Start();            
+            SequentialRadixTreeSort.Run(sArray);
+
+            timer.Stop();
+            Console.WriteLine("Elapsed time: {0} seconds\n\n", timer.ElapsedMilliseconds / 1000.0);
+            
+
+            // run parallel test
+            timer.Restart();            
+            ParallelRadixTreeSort.Run(pArray);
+            timer.Stop();
+            Console.WriteLine("Elapsed time: {0} seconds\n\n", timer.ElapsedMilliseconds / 1000.0);
         }
 
         /// <summary>
@@ -42,11 +61,12 @@ namespace RadixTreeSort
         /// <param name="args">Does nothing.</param>
         public static void Main(string[] args)
         {
-           System.Console.SetBufferSize(200,1000);   // make sure buffer is bigger than window
-           System.Console.SetWindowSize(120,40);   //set window size to almost full screen
-           System.Console.SetWindowPosition(0,0);   // sets window position to upper left
+            Console.WriteLine("-------------------------------------------------------------------------------");
+            Console.WriteLine("C#");
+            Console.WriteLine("-------------------------------------------------------------------------------");
+            Console.WriteLine("");
 
-           Program p = new Program(1, 400, Int32.MaxValue);
+           Program p = new Program(1, 50, Int32.MaxValue);
 
            Console.ReadLine();
         }
