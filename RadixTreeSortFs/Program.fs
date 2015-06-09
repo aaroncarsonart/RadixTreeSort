@@ -110,9 +110,11 @@ let rec get (current : Node[]) sortedPosition (bits:int[]) bitPosition =
 // *************************************************************
 let sequentialRadixTreeSort values = 
     Console.WriteLine "SequentialRadixTreeSort()"
+    (*
     printfn "\nUnsorted:"
     printNums values
     printfn ""
+    *)
 
     // get the root.
     let root = getNodeSet
@@ -130,10 +132,12 @@ let sequentialRadixTreeSort values =
     // values |> Seq.iter (get root initialPosition)
     let result = Array.init (Array.length values) (fun p -> get root (p + 1) (Array.zeroCreate bitCount) initialPosition)
 
+    (*
     printfn "\nSorted:"
     //printStrings result
     printNums result
-   
+    *)
+
     result
 
 // *************************************************************
@@ -145,14 +149,14 @@ let main args =
     printfn "F#"
     printfn "-------------------------------------------------------------------------------"
     printfn ""
-    let values = getRandomArray 50
+    let values = getRandomArray 100000
 
     // start stopwatch and run test.
     let stopWatch = System.Diagnostics.Stopwatch.StartNew()
     let sortedValues = sequentialRadixTreeSort values
     stopWatch.Stop()
 
-    printfn "Elapsed time: %f seconds" (float (stopWatch.Elapsed.Milliseconds) / 1000.0);
+    printfn "Elapsed time: %f seconds" (float (stopWatch.ElapsedMilliseconds) / 1000.0);
 
     Console.ReadLine() |> ignore
     0

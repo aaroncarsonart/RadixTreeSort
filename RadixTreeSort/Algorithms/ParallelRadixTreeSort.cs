@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace RadixTreeSort
         public static int[] Run(int[] values)
         {
             Console.WriteLine("ParallelRadixTreeSort.Run()");
-            Console.WriteLine("\ninitial values:\n{0}\n", Utility.ArrayContentsToString(values));
+            //Console.WriteLine("\ninitial values:\n{0}\n", Utility.ArrayContentsToString(values));
 
             // initialize the root of the tree.
             Node[] root = Node.NewSet();
@@ -38,13 +39,38 @@ namespace RadixTreeSort
             // **********************************************************************
             // 2. Retrieve each integer in-order and place into values.
             // **********************************************************************
-            
+
+            ConcurrentQueue<Exception> exceptions = new ConcurrentQueue<Exception>();
             System.Threading.Tasks.Parallel.For(0, values.Length,p =>
             {
                 values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0);
+                /*
+                try
+                {
+                    //Console.Write("{0}: ", p);
+                    values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0);
+                    //Console.WriteLine();
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Enqueue(ex);
+                }
+                 * */
             });
+
             
-            Console.WriteLine("\nsorted values:\n{0}\n", Utility.ArrayContentsToString(values));
+            if (exceptions.Count() > 0)
+            {
+                Console.WriteLine("{0} exceptions occurred.", exceptions.Count());
+                /*
+                foreach (Exception e in exceptions)
+                {
+                    Console.WriteLine(e);
+                }
+                */
+            }
+
+            //Console.WriteLine("\nsorted values:\n{0}\n", Utility.ArrayContentsToString(values));
             return values;
         }
 
@@ -61,11 +87,14 @@ namespace RadixTreeSort
             int bit = (value >> position) & 1;
             //Console.Write(bit + (position %4 == 0 ? " " : ""));
 
-            // 4. increment the appropriate count.
-            current[bit].Count += 1;
+            lock (current[bit])
+            {
+                // 4. increment the appropriate count.
+                current[bit].Count += 1;
 
-            // 2. initialize Next if null
-            current[bit].Next = current[bit].Next ?? Node.NewSet();
+                // 2. initialize Next if null
+                current[bit].Next = current[bit].Next ?? Node.NewSet();
+            }
 
             // 3. if position is not zero, recurse with the position of next bit.
             if (position != 0)

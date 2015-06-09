@@ -19,7 +19,7 @@ namespace RadixTreeSort
         public static int[] Run(int[] values)
         {
             Console.WriteLine("SequentialRadixTreeSort.Run()");
-            Console.WriteLine("\ninitial values:\n{0}\n", Utility.ArrayContentsToString(values));
+            //Console.WriteLine("\ninitial values:\n{0}\n", Utility.ArrayContentsToString(values));
 
             // initialize the root of the tree.
             Node[] root = Node.NewSet();
@@ -44,7 +44,7 @@ namespace RadixTreeSort
                 values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0);
             }
             
-            Console.WriteLine("\nsorted values:\n{0}\n", Utility.ArrayContentsToString(values));
+            //Console.WriteLine("\nsorted values:\n{0}\n", Utility.ArrayContentsToString(values));
             return values;
         }
 

@@ -34,21 +34,29 @@ namespace RadixTreeSort
         private void RunTest(int size, int maxValue)
         {
             Stopwatch timer = new Stopwatch();
+
             int[] array = Utility.GetRandomArray(size, maxValue);
-            int[] sArray = new int[array.Length];
-            int[] pArray = new int[array.Length];
-            array.CopyTo(sArray, 0);
-            array.CopyTo(pArray, 0);
+            
+            // run control test (systen library)
+            int[] cArray = new int[array.Length];
+            array.CopyTo(cArray, 0);
+            timer.Start();
+            Console.WriteLine("Array.Sort()");
+            Array.Sort(cArray);
+            timer.Stop();
+            Console.WriteLine("Elapsed time: {0} seconds\n\n", timer.ElapsedMilliseconds / 1000.0);
 
             // run sequential test
-            timer.Start();            
+            int[] sArray = new int[array.Length];
+            array.CopyTo(sArray, 0);
+            timer.Restart();
             SequentialRadixTreeSort.Run(sArray);
-
             timer.Stop();
             Console.WriteLine("Elapsed time: {0} seconds\n\n", timer.ElapsedMilliseconds / 1000.0);
             
-
             // run parallel test
+            int[] pArray = new int[array.Length];
+            array.CopyTo(pArray, 0);
             timer.Restart();            
             ParallelRadixTreeSort.Run(pArray);
             timer.Stop();
@@ -66,9 +74,8 @@ namespace RadixTreeSort
             Console.WriteLine("-------------------------------------------------------------------------------");
             Console.WriteLine("");
 
-           Program p = new Program(1, 50, Int32.MaxValue);
-
-           Console.ReadLine();
+            Program p = new Program(1, 100000, Int32.MaxValue);
+            Console.ReadLine();
         }
     }
 }
