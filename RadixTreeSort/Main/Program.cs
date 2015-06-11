@@ -49,8 +49,9 @@ namespace RadixTreeSort
                 case LSD:
                     Console.Write("LSDRadixSort.Run({0:N0}): ", array.Length);
                     timer.Start();
-                    LSDRadixSort.Run(arrayCopy);
+                    arrayCopy = LSDRadixSort.RunBinary(arrayCopy);
                     timer.Stop();
+                    //Console.WriteLine(Utility.ArrayContentsToString(arrayCopy));
                     break;
 
                 case SEQUENTIAL:
@@ -81,12 +82,10 @@ namespace RadixTreeSort
         /// <summary>
         /// Run tests, comparing each kind of sorting algorithm.
         /// </summary>
-        public static void TestSortingAlgorithms()
+        public static void TestSortingAlgorithms(int[] types, int arraySize, int testsPerAlgorithm)
         {
             // specify test parameters
-            int arraySize = 100000;
             int maxValue = Int32.MaxValue;
-            int testsPerAlgorithm = 3;
 
             // create the array
             int[] array = Utility.GetRandomArray(arraySize, maxValue);
@@ -94,7 +93,7 @@ namespace RadixTreeSort
             // ***********************************
             // run tests for each algorithm type
             // ***********************************
-            foreach (int type in TYPES)
+            foreach (int type in types)
             {
                 double times = 0.0;
                 // run the specified number of tests
@@ -115,6 +114,14 @@ namespace RadixTreeSort
                     Console.WriteLine();
                 }
             }
+        }
+
+        /// <summary>
+        /// Run tests, comparing each kind of sorting algorithm.
+        /// </summary>
+        public static void TestSortingAlgorithms(int arraySize, int testsPerAlgorithm)
+        {
+            TestSortingAlgorithms(TYPES, arraySize, testsPerAlgorithm);
         }
 
         /// <summary>
@@ -140,8 +147,10 @@ namespace RadixTreeSort
             Console.WriteLine("-------------------------------------------------------------------------------");
             Console.WriteLine("");
 
-            TestSortingAlgorithms();
+            TestSortingAlgorithms(new int[]{ PARALLEL, P_IMPROVED }, 10000, 10);
             //TestLSDRadixStringSort(100000, 32);
+
+            //Parallel.For(0, 10, p => Console.WriteLine(p));
 
             Console.Write("Tests complete.  Press any key to continue...");
             Console.ReadLine();

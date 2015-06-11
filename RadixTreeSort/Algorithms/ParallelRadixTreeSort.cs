@@ -52,14 +52,14 @@ namespace RadixTreeSort
                     Put(root, values[i], initialPosition);
                 }
             });
-            */ 
+            */
 
             // **********************************************************************
             // 2. Retrieve each integer in-order and place into values.
             // **********************************************************************
             System.Threading.Tasks.Parallel.For(0, values.Length, p => values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0) );
 
-            /*
+            
             System.Threading.Tasks.Parallel.For(0, CPUS, p =>
             {
                 // loop over chunk of values
@@ -71,7 +71,7 @@ namespace RadixTreeSort
                 }
                 
             });
-            */
+            
 
             //Console.WriteLine("\nsorted values:\n{0}\n", Utility.ArrayContentsToString(values));
             return values;
@@ -124,11 +124,13 @@ namespace RadixTreeSort
             // also faster than increment in lock code block.
             current[bit].IncrementCount();
 
-            lock (current[bit])
-            {
-                // 2. initialize Next if null
-                current[bit].Next = current[bit].Next ?? Node.NewSet();
-            }
+
+                lock (current[bit])
+                {
+                    // 2. initialize Next if null
+                    current[bit].Next = current[bit].Next ?? Node.NewSet();
+                    //) current[bit].Next = Node.NewSet();
+                }
 
             // 3. if position is not zero, recurse with the position of next bit.
             if (position != 0)
@@ -137,6 +139,8 @@ namespace RadixTreeSort
             }
 
         }
+
+
 
         /// <summary>
         /// Helper method to get A value in ascending order from a tree.

@@ -17,14 +17,46 @@ namespace RadixTreeSort
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        public static int[] Run(int[] values)
+        public static int[] RunBinary(int[] values)
         {
             // step 1: convert values to binary strings.
             String[] a = values.Select(i => Convert.ToString(i, 2).PadLeft(32, '0')).ToArray();
             int W = 32;
 
             // run exact method from CS 311 Algorithms book
-            Run(a, W);
+            int N = a.Length;
+            int R = 2;
+            string[] aux = new string[N];
+
+            for (int d = W - 1; d >= 0; d--)
+            {
+                // compute frequency count
+                int[] count = new int[R + 1];
+                for (int i = 0; i < N; i++)
+                {
+                    int index = (int)Char.GetNumericValue(a[i], d) + 1;
+                    count[index]++;
+                }
+
+                // transform counts to indices
+                for (int r = 0; r < R; r++)
+                {
+                    count[r + 1] += count[r];
+                }
+
+                // distribute.
+                for (int i = 0; i < N; i++)
+                {
+                    int index = (int)Char.GetNumericValue(a[i], d);
+                    aux[count[index]++] = a[i];
+                }
+
+                // copy back.
+                for (int i = 0; i < N; i++)
+                {
+                    a[i] = aux[i];
+                }
+            }
 
             // convert strings back to integers.
             return a.Select(s => Convert.ToInt32(s, 2)).ToArray();
@@ -74,51 +106,8 @@ namespace RadixTreeSort
             }
         }
 
-        /// <summary>
-        /// Run the LSD Radix Sort from Sedgewick/Wayne Algorithms book.
-        /// This assumes that all Strings are of equal length.
-        /// </summary>
-        /// <param name="values">The array of strings to run on.</param>
-        /// <param name="W">Number of leading characters to sort on</param>
-        /// <returns></returns>
-        public static void RunBinary(string[] a, int W)
-        {
-            int N = a.Length;
-            int R = 2;
-            string[] aux = new string[N];
 
-            for (int d = W - 1; d >= 0; d--)
-            {
-                // compute frequency count
-                int[] count = new int[R + 1];
-                for (int i = 0; i < N; i++)
-                {
-                    int index = (int)Char.GetNumericValue(a[i], d) + 1;
-                    count[index]++;
-                }
-
-                // transform counts to indices
-                for (int r = 0; r < R; r++)
-                {
-                    count[r + 1] += count[r];
-                }
-
-                // distribute.
-                for (int i = 0; i < N; i++)
-                {
-                    int index = (int)Char.GetNumericValue(a[i], d);
-                    aux[count[index]++] = a[i];
-                }
-
-                // copy back.
-                for (int i = 0; i < N; i++)
-                {
-                    a[i] = aux[i];
-                }
-            }
-        }
-
-        public static void RunTest(int[] array)
+        public static void RunBinaryTest(int[] array)
         {
             // make local copy to preserve original array
             int[] arrayCopy = new int[array.Length];
@@ -130,7 +119,7 @@ namespace RadixTreeSort
             Console.WriteLine("Initial:\n{0}", Utility.ArrayContentsToString(arrayCopy));
 
             timer.Start();
-            arrayCopy = Run(arrayCopy);
+            arrayCopy = RunBinary(arrayCopy);
             timer.Stop();
 
             Console.WriteLine("Sorted:\n{0}", Utility.ArrayContentsToString(arrayCopy));
