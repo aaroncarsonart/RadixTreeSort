@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RadixTreeSort
@@ -17,9 +18,73 @@ namespace RadixTreeSort
         /// </summary>
         /// <param name="values">An array of integers to sort.</param>
         /// <returns>The sorted array.</returns>
+        public static int[] RunImproved(int[] values)
+        {
+            //Console.WriteLine("ParallelRadixTreeSort.RunImproved()");
+            //Console.WriteLine("\ninitial values:\n{0}\n", Utility.ArrayContentsToString(values));
+
+            int CPUS = Environment.ProcessorCount;
+
+            // initialize the root of the tree.
+            Node[] root = Node.NewSet();
+            int bitCount = 8 * sizeof(int);
+            int initialPosition = bitCount - 1;
+
+            // **********************************************************************
+            // 1. put each integer into the tree.
+            // **********************************************************************
+            int size = values.Length;
+            int chunk = size / CPUS;
+
+            // put is faster with simple loop than using chunk
+            System.Threading.Tasks.Parallel.For(0, values.Length, p => Put(root, values[p], initialPosition));
+
+            
+            // parallel over number of cpus
+            /*
+            System.Threading.Tasks.Parallel.For(0, CPUS, p =>
+            {
+                // loop over chunk of values
+                int len = Math.Min(size, (p + 1) * chunk);
+                for (int i = p * chunk; i < len; i++)
+                {
+                    // put each number into the tree
+                    Put(root, values[i], initialPosition);
+                }
+            });
+            */ 
+
+            // **********************************************************************
+            // 2. Retrieve each integer in-order and place into values.
+            // **********************************************************************
+            System.Threading.Tasks.Parallel.For(0, values.Length, p => values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0) );
+
+            /*
+            System.Threading.Tasks.Parallel.For(0, CPUS, p =>
+            {
+                // loop over chunk of values
+                int len = Math.Min(size, (p + 1) * chunk);
+                for (int i = p * chunk; i < len; i++)
+                {
+                    // get each value from the tree
+                    values[i] = Get(root, i + 1, new int[bitCount], initialPosition, 0);
+                }
+                
+            });
+            */
+
+            //Console.WriteLine("\nsorted values:\n{0}\n", Utility.ArrayContentsToString(values));
+            return values;
+        }
+
+
+        /// <summary>
+        /// Run a sequential RadixTreeSort over an array of integers.
+        /// </summary>
+        /// <param name="values">An array of integers to sort.</param>
+        /// <returns>The sorted array.</returns>
         public static int[] Run(int[] values)
         {
-            Console.WriteLine("ParallelRadixTreeSort.Run()");
             //Console.WriteLine("\ninitial values:\n{0}\n", Utility.ArrayContentsToString(values));
 
             // initialize the root of the tree.
@@ -30,49 +95,17 @@ namespace RadixTreeSort
             // **********************************************************************
             // 1. put each integer into the tree.
             // **********************************************************************
-            System.Threading.Tasks.Parallel.For(0, values.Length, p =>
-            {
-                int value = values[p];
-                Put(root, value, initialPosition);
-            });
+            System.Threading.Tasks.Parallel.For(0, values.Length, p => Put(root, values[p], initialPosition) );
 
             // **********************************************************************
             // 2. Retrieve each integer in-order and place into values.
             // **********************************************************************
-
-            ConcurrentQueue<Exception> exceptions = new ConcurrentQueue<Exception>();
-            System.Threading.Tasks.Parallel.For(0, values.Length,p =>
-            {
-                values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0);
-                /*
-                try
-                {
-                    //Console.Write("{0}: ", p);
-                    values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0);
-                    //Console.WriteLine();
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Enqueue(ex);
-                }
-                 * */
-            });
-
-            
-            if (exceptions.Count() > 0)
-            {
-                Console.WriteLine("{0} exceptions occurred.", exceptions.Count());
-                /*
-                foreach (Exception e in exceptions)
-                {
-                    Console.WriteLine(e);
-                }
-                */
-            }
+            System.Threading.Tasks.Parallel.For(0, values.Length, p => values[p] = Get(root, p + 1, new int[bitCount], initialPosition, 0));
 
             //Console.WriteLine("\nsorted values:\n{0}\n", Utility.ArrayContentsToString(values));
             return values;
         }
+
 
         /// <summary>
         /// Put is a helper method that recursively inserts an integer one bit at a time into a binary tree.
@@ -87,11 +120,12 @@ namespace RadixTreeSort
             int bit = (value >> position) & 1;
             //Console.Write(bit + (position %4 == 0 ? " " : ""));
 
+            // increment using atomic Interlocked.Increment() (prevent race condition)
+            // also faster than increment in lock code block.
+            current[bit].IncrementCount();
+
             lock (current[bit])
             {
-                // 4. increment the appropriate count.
-                current[bit].Count += 1;
-
                 // 2. initialize Next if null
                 current[bit].Next = current[bit].Next ?? Node.NewSet();
             }

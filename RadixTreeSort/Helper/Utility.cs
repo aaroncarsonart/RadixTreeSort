@@ -142,9 +142,27 @@ namespace RadixTreeSort
             }
             else
             {
-                return String.Format("{{\n    {0}\n}}", String.Join(",\n    ", values.Select(i => String.Format("{0,10}", i)).ToArray() ));
+                return String.Format("{{\n    {0}\n}}", String.Join(",\n    ", values.Select(i => String.Format("{0,10}", i)).ToArray()));
             }
         }
+
+        /// <summary>
+        /// Get a string that represents the contents of an array.
+        /// </summary>
+        /// <param name="values">The array of strings to iterate over.</param>
+        /// <returns>A formatted string displaying the contents of the array.</returns>
+        public static String ArrayContentsToString(string[] values)
+        {
+            if (values.Length <= 10)
+            {
+                return String.Format("{{ {0} }}", String.Join(", ", values));
+            }
+            else
+            {
+                return String.Format("{{\n    {0}\n}}", String.Join(",\n    ", values.Select(s => String.Format("{0,10}", s)).ToArray()));
+            }
+        }
+
 
         public static String AddSpacing(String binary)
         {

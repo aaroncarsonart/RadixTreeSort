@@ -18,7 +18,7 @@ namespace RadixTreeSort
         /// <returns>The sorted array.</returns>
         public static int[] Run(int[] values)
         {
-            Console.WriteLine("SequentialRadixTreeSort.Run()");
+            //Console.WriteLine("SequentialRadixTreeSort.Run()");
             //Console.WriteLine("\ninitial values:\n{0}\n", Utility.ArrayContentsToString(values));
 
             // initialize the root of the tree.

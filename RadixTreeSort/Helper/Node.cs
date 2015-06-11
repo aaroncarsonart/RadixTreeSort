@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RadixTreeSort
@@ -12,10 +13,22 @@ namespace RadixTreeSort
     /// </para>
     public class Node
     {
+        private int _count;
+
         /// <summary>
         /// Used to track the number of values stored through this Node.
         /// </summary>
-        public int Count { get; set; }
+        public int Count 
+        {
+            get
+            {
+                return _count;
+            }
+            set
+            {
+                _count = value;
+            }
+        }
 
         /// <summary>
         /// A reference to the next Node[] in the tree, will be null if not set.
@@ -29,6 +42,11 @@ namespace RadixTreeSort
         {
             Count = 0;
             Next = null;
+        }
+
+        public void IncrementCount()
+        {
+            Interlocked.Increment(ref _count);
         }
 
         /// <summary>
