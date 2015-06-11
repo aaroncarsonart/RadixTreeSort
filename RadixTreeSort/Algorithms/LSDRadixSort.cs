@@ -167,16 +167,16 @@ namespace RadixTreeSort
             array.CopyTo(arrayCopy, 0);
 
 
-            Console.WriteLine("LSDRadixSort.Run()");
+            Console.WriteLine("LSDRadixSort.Run({0:N0})", array.Length);
             Stopwatch timer = new Stopwatch();
-            Console.WriteLine("Initial:\n{0}", Utility.ArrayContentsToString(arrayCopy));
+           // Console.WriteLine("Initial:\n{0}", Utility.ArrayContentsToString(arrayCopy));
 
             timer.Start();
             Run(arrayCopy, W);
             timer.Stop();
 
-            Console.WriteLine("Sorted:\n{0}", Utility.ArrayContentsToString(arrayCopy));
-            Console.WriteLine("Elapsed time: {0:N3}", timer.ElapsedMilliseconds / 1000.0);
+            //Console.WriteLine("Sorted:\n{0}", Utility.ArrayContentsToString(arrayCopy));
+            Console.WriteLine("Elapsed time: {0:N3} seconds", timer.ElapsedMilliseconds / 1000.0);
         }
     }
 }

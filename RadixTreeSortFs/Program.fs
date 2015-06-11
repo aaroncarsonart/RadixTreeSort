@@ -151,6 +151,7 @@ let main args =
     printfn ""
     let values = getRandomArray 100000
 
+
     // start stopwatch and run test.
     let stopWatch = System.Diagnostics.Stopwatch.StartNew()
     let sortedValues = sequentialRadixTreeSort values

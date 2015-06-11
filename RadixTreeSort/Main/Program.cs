@@ -84,7 +84,7 @@ namespace RadixTreeSort
         public static void TestSortingAlgorithms()
         {
             // specify test parameters
-            int arraySize = 10000;
+            int arraySize = 100000;
             int maxValue = Int32.MaxValue;
             int testsPerAlgorithm = 3;
 
@@ -140,8 +140,8 @@ namespace RadixTreeSort
             Console.WriteLine("-------------------------------------------------------------------------------");
             Console.WriteLine("");
 
-            //TestSortingAlgorithms();
-            TestLSDRadixStringSort(100000, 32);
+            TestSortingAlgorithms();
+            //TestLSDRadixStringSort(100000, 32);
 
             Console.Write("Tests complete.  Press any key to continue...");
             Console.ReadLine();
