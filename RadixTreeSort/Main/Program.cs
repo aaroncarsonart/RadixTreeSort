@@ -147,7 +147,7 @@ namespace RadixTreeSort
             Console.WriteLine("-------------------------------------------------------------------------------");
             Console.WriteLine("");
 
-            TestSortingAlgorithms(new int[]{ PARALLEL, P_IMPROVED }, 10000, 10);
+            TestSortingAlgorithms(new int[]{ SEQUENTIAL,PARALLEL, P_IMPROVED }, 100000, 10);
             //TestLSDRadixStringSort(100000, 32);
 
             //Parallel.For(0, 10, p => Console.WriteLine(p));
